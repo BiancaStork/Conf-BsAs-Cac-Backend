@@ -69,11 +69,11 @@ public class NuevoOradorController extends HttpServlet{
 		mapper.registerModule(new JavaTimeModule());
 		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		
-		String jsonParaEnviarAlFrontend = mapper.writeValueAsString(oradores);
+		String json = mapper.writeValueAsString(oradores);
 		
 		response.setStatus(HttpServletResponse.SC_OK);
 
 		//escribe la respueta en el objeto response (que despues es lo que recibe el front)
-		response.getWriter().print(jsonParaEnviarAlFrontend );
+		response.getWriter().print(json);
 	}
 }
