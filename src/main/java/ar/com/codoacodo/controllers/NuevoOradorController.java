@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/api/orador/nuevo")
+@WebServlet("/api/orador")
 
 public class NuevoOradorController extends HttpServlet{
 	
@@ -75,5 +75,12 @@ public class NuevoOradorController extends HttpServlet{
 
 		//escribe la respueta en el objeto response (que despues es lo que recibe el front)
 		response.getWriter().print(json);
+	}
+	
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		String id = req.getParameter("id");		
+		this.repository.delete(Long.parseLong(id));		
+		resp.setStatus(HttpServletResponse.SC_OK);
 	}
 }
