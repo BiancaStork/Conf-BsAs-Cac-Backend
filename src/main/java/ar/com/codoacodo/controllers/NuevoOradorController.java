@@ -1,4 +1,5 @@
 package ar.com.codoacodo.controllers;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/api/orador")
 
-public class NuevoOradorController extends HttpServlet{
+public class NuevoOradorController extends AppBaseController{
 	
 	private OradorRepository repository = new MySQLOradorRepository();		
 	
@@ -31,15 +32,10 @@ public class NuevoOradorController extends HttpServlet{
 			HttpServletResponse response)  //aca va hacia el front
 					throws ServletException, IOException {
 		//obtengo el json desde el frontend
-		String json = request.getReader()
-				.lines()
-				.collect(Collectors.joining(System.lineSeparator()));//spring
-		
+		String json = super.toJson(request);
 		//convierto de json String a Objecto java usando libreria de jackson2
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new JavaTimeModule());
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		OradorRequest oradorRequest = mapper.readValue(json, OradorRequest.class);
+		
+		OradorRequest oradorRequest = super.mapper.readValue(json, OradorRequest.class);
 		
 		//grabamos en db
 	
@@ -83,4 +79,35 @@ public class NuevoOradorController extends HttpServlet{
 		this.repository.delete(Long.parseLong(id));		
 		resp.setStatus(HttpServletResponse.SC_OK);
 	}
+	
+	protected void doPut(
+			HttpServletRequest request, 
+			HttpServletResponse response) throws ServletException, IOException {
+		
+		//capturar el id que viene en la url ?id=1
+		String id = request.getParameter("id");
+		
+		String json = super.toJson(request);
+		//convierto de json String a Objecto java usando libreria de jackson2
+	
+		OradorRequest oradorRequest = super.mapper.readValue(json, OradorRequest.class);
+		
+		//busco el orador en la db
+				Orador orador = repository.getById(Long.parseLong(id));
+		
+	  		
+		
+		//actualizo los datos del orado con los nuevo que viene en el OradorRequest 	
+		orador.setNombre(oradorRequest.getNombre());
+		orador.setApellido(oradorRequest.getApellido()); 
+		orador.setMail(oradorRequest.getMail()); 
+		orador.setTema(oradorRequest.getTema()); 
+
+		//ahora si actualizo en la db
+		repository.update(orador);
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+	}
+
+	
 }
